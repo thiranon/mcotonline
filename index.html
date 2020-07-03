@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0,viewport-fit=cover">
   <title>My LIFF app</title>
   <link rel="stylesheet" href="css/style.css" media="all">
 </head>
+
 <body>
   <p id="os"><b>OS:</b> </p>
   <p id="language"><b>Language:</b> </p>
@@ -54,24 +56,69 @@
     }
 
     function closed() {
+      liff.closeWindow()
     }
 
     async function scanCode() {
+      const result = await liff.scanCode()
+      document.getElementById("scanCode").append(result.value)
     }
 
     function openWindow() {
+      liff.openWindow({
+        url: "https://line.me",
+        external: true
+      })
     }
 
     async function getFriendship() {
+      const friend = await liff.getFriendship()
+      document.getElementById("friendship").append(friend.friendFlag)
+      if (!friend.friendFlag) {
+        if (confirm("คุณยังไม่ได้เพิ่ม BOT เป็นเพื่อน จะเพิ่มเลยไหม?")) {
+          window.location = "https://line.me/R/ti/p/@765kbhvr"
+        }
+      }
     }
 
     async function sendMsg() {
+      if (liff.getContext().type !== "none" && liff.getContext().type !== "external") {
+        await liff.sendMessages([
+          {
+            "type": "sticker",
+            "sticker": 1,
+            "packedId": 1
+          },
+          {
+            "type": "sticker",
+            "sticker": 2,
+            "packedId": 1
+          },
+          {
+            "type": "sticker",
+            "sticker": 3,
+            "packedId": 1
+          }
+        ])
+        alert("Message sent!")
+      }
     }
 
     function getContext() {
+      document.getElementById("type").append(liff.getContext().type)
+      document.getElementById("viewType").append(liff.getContext().viewType)
+      document.getElementById("utouId").append(liff.getContext().utouId)
+      document.getElementById("roomId").append(liff.getContext().roomId)
+      document.getElementById("grouId").append(liff.getContext().groupId)
     }
 
     async function getUserProfile() {
+      const profile = await liff.getUserProfile()
+      document.getElementById("pictureUrl").src = profile.pictureUrl
+      document.getElementById("userId").append(profile.userId)
+      document.getElementById("statusMessage").append(profile.statusMessage)
+      document.getElementById("displayName").append(profile.displayName)
+      document.getElementById("decodedIDToken").append(liff.getDecodeIDToken().email)
     }
 
     function getEnvironment() {
@@ -80,7 +127,7 @@
       document.getElementById("version").append(liff.getVersion())
       document.getElementById("accessToken").append(liff.AccessToken())
       document.getElementById("isInClinet").append(liff.isInClient())
-      if(liff.isInClient()) {
+      if (liff.isInClient()) {
         document.getElementById("btnLogOut").style.display = "none"
       } else {
         document.getElementById("btnMsg").style.display = "none"
@@ -92,13 +139,17 @@
     async function main() {
       // alert("LINE Developers x Skooldio")
       await liff.init({ liffId: "1654409809-1GGRaMo6" })
-      getEnvironment()
-      getUserProfile()
-      getContext()
-      getFriendship()
+      document.getElementById("isLoggedIn").append(liff.isLoggedIn())
+      if (liff.isLoggedIn()) {
+        getEnvironment()
+        getUserProfile()
+        getContext()
+        getFriendship()
+      }
       createUniversalLink()
     }
     main()
   </script>
 </body>
+
 </html>
